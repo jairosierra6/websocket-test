@@ -1,14 +1,78 @@
 <template>
   <v-app id="inspire">
-    <v-system-bar app>
-      <v-spacer></v-spacer>
 
-      <v-icon>mdi-square</v-icon>
-
-      <v-icon>mdi-circle</v-icon>
-
-      <v-icon>mdi-triangle</v-icon>
-    </v-system-bar>
+    <div>
+      <v-dialog
+        v-model="dialog"
+        persistent
+        max-width="600px"
+      >
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Connect to event</span>
+          </v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+                >
+                  <v-text-field
+                    label="Legal first name*"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+                >
+                  <v-text-field
+                    label="Legal middle name"
+                    hint="example of helper text only on focus"
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                  md="4"
+                >
+                  <v-text-field
+                    label="Legal last name*"
+                    hint="example of persistent helper text"
+                    persistent-hint
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="6"
+                >
+                  <v-select
+                    :items="['0-17', '18-29', '30-54', '54+']"
+                    label="Select your event*"
+                    required
+                  ></v-select>
+                </v-col>
+              </v-row>
+            </v-container>
+            <small>*indicates required field</small>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue darken-1"
+              text
+              @click="dialog = false"
+            >
+              Connect
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>    
 
     <v-navigation-drawer
       v-model="drawer"
@@ -28,8 +92,7 @@
 
         </v-avatar>
 
-        <div v-if="userLoaded">john@vuetifyjs.com</div>
-        <div v-else>User name</div>
+        <div >{{username}}</div>
       </v-sheet>
 
       <v-divider></v-divider>
@@ -101,13 +164,42 @@
 <script>
   export default {
     data: () => ({
-      userLoaded: true,
+      connection: null,
+      socketUrl: 'wss://tnpbcownl8.execute-api.us-east-2.amazonaws.com/dev',
+      username: 'User Name',
+      userLoaded: false,
+      dialog: true,
       cards: ['Category 1', 'Category 2'],
       drawer: null,
       links: [
         ['mdi-delete', 'Disconnect'],
-        ['mdi-alert-octagon', 'Warnings'],
+        ['mdi-alert-octagon', 'Status'],
       ],
     }),
+    methods: {
+      sendMessage: function(message) {
+        console.log(this.connection);
+        this.connection.send(message);
+      }
+    },
+    created: function() {
+      console.log("Starting connection to WebSocket Server")
+      this.connection = new WebSocket(this.socketUrl);
+
+      this.connection.onmessage = function(event) {
+        console.log(event);
+      }
+      this.connection.onopen = function(event) {
+        console.log(event)
+        console.log("Successfully connected to the echo websocket server...")
+      }
+      this.connection.onclose = function(event) {
+        console.log('closed connection: ', event);
+      }
+      this.connection.onerror = function(event) {
+        console.log('error: ', event);
+      }
+
+    }
   }
 </script>
