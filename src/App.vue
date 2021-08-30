@@ -21,6 +21,8 @@
                 >
                   <v-text-field
                     label="First name*"
+                    v-model="fName"
+                    :rules="nameRules"
                     required
                   ></v-text-field>
                 </v-col>
@@ -31,6 +33,7 @@
                 >
                   <v-text-field
                     label="Middle name"
+                    v-model="mName"
                     hint="example of helper text only on focus"
                   ></v-text-field>
                 </v-col>
@@ -41,6 +44,8 @@
                 >
                   <v-text-field
                     label="Last name*"
+                    v-model="lName"
+                    :rules="nameRules"
                     hint="example of persistent helper text"
                     persistent-hint
                     required
@@ -52,8 +57,11 @@
                 >
                   <v-select v-if="eventList !== undefined"
                     v-model="selectedEvent"
-                    :items="eventList.map(event => event.eventName)"
+                    :items="eventList"
+                    :item-text="'eventName'"
+                    :item-value="'roomId'"
                     label="Select your event*"
+                    :rules="nameRules"
                     required
                   ></v-select>
                 </v-col>
@@ -66,7 +74,7 @@
             <v-btn
               color="blue darken-1"
               text
-              @click="dialog = false"
+              @click="sendUpdate()"
             >
               Connect
             </v-btn>
@@ -177,11 +185,18 @@
         ['mdi-alert-octagon', 'Status'],
       ],
       eventList: [],
-      selectedEvent: {}
+      selectedEvent: {},
+      fName: '',
+      mName: '',
+      lName: '',
+      newEventData: '',
+      nameRules: [
+          (v) => !!v || 'Field is required'
+        ],
     }),
     watch: {
       eventList: function() {
-        console.log('HOLIIII ', this.eventList);
+        console.log('Event changed ', this.eventList);
       }
     },
     methods: {
@@ -191,6 +206,17 @@
       },
       testIng(msg){
         console.log('AAAAA, ', msg);
+      },
+      sendUpdate() {
+        const structure = {
+          "action": "setEvent",
+          "roomId": `${this.selectedEvent}`,
+          "users": `{"name": "${this.fName} ${this.mName} ${this.lName}", "id": "${this.selectedEvent}"}` ,
+          "eventJSON":null
+          }
+          console.log('STRUCTURE: ', JSON.stringify(structure));
+          this.sendMessage(JSON.stringify(structure));
+          this.dialog = false;
       }
     },
     created: function() {
