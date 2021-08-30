@@ -134,6 +134,11 @@
             :key="card"
             cols="12"
           >
+
+          <!-- Viejo ramiro desde aca puedes agregar los controles -->
+
+
+          <!-- hasta aca agregar los controles -->
             <v-card>
               <v-subheader>{{ card }}</v-subheader>
 
