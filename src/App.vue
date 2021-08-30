@@ -136,7 +136,37 @@
           >
 
           <!-- Viejo ramiro desde aca puedes agregar los controles -->
-
+            <v-checkbox
+                v-model="checkLanguage"
+                label="Enable event languages"
+                color="primary"
+                value="language"
+                hide-details
+            ></v-checkbox>
+            <v-checkbox
+                v-model="checkLogin"
+                label="Enable auto login"
+                color="primary"
+                value="auto login"
+                hide-details
+            ></v-checkbox>
+            <v-checkbox
+                v-model="checkVideo"
+                label="Enable video"
+                color="primary"
+                value="video"
+                hide-details
+            ></v-checkbox>
+            <v-text-field
+                v-model="configuration"
+                label="Name of the event"
+                placeholder="Name of the event"
+            ></v-text-field>
+            <v-text-field
+                v-model="url"
+                label="Vep url of the event"
+                placeholder="Url of the event"
+            ></v-text-field>
 
           <!-- hasta aca agregar los controles -->
             <v-card>
