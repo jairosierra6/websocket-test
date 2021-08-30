@@ -20,7 +20,7 @@
                   md="4"
                 >
                   <v-text-field
-                    label="Legal first name*"
+                    label="First name*"
                     required
                   ></v-text-field>
                 </v-col>
@@ -30,7 +30,7 @@
                   md="4"
                 >
                   <v-text-field
-                    label="Legal middle name"
+                    label="Middle name"
                     hint="example of helper text only on focus"
                   ></v-text-field>
                 </v-col>
@@ -40,7 +40,7 @@
                   md="4"
                 >
                   <v-text-field
-                    label="Legal last name*"
+                    label="Last name*"
                     hint="example of persistent helper text"
                     persistent-hint
                     required
@@ -50,8 +50,9 @@
                   cols="12"
                   sm="6"
                 >
-                  <v-select
-                    :items="['0-17', '18-29', '30-54', '54+']"
+                  <v-select v-if="eventList !== undefined"
+                    v-model="selectedEvent"
+                    :items="eventList.map(event => event.eventName)"
                     label="Select your event*"
                     required
                   ></v-select>
@@ -168,30 +169,58 @@
       socketUrl: 'wss://tnpbcownl8.execute-api.us-east-2.amazonaws.com/dev',
       username: 'User Name',
       userLoaded: false,
-      dialog: true,
+      dialog: false,
       cards: ['Category 1', 'Category 2'],
       drawer: null,
       links: [
         ['mdi-delete', 'Disconnect'],
         ['mdi-alert-octagon', 'Status'],
       ],
+      eventList: [],
+      selectedEvent: {}
     }),
+    watch: {
+      eventList: function() {
+        console.log('HOLIIII ', this.eventList);
+      }
+    },
     methods: {
-      sendMessage: function(message) {
-        console.log(this.connection);
+      sendMessage(message) {
+        console.log('CONNECTION: ', this.connection);
         this.connection.send(message);
+      },
+      testIng(msg){
+        console.log('AAAAA, ', msg);
       }
     },
     created: function() {
       console.log("Starting connection to WebSocket Server")
       this.connection = new WebSocket(this.socketUrl);
+      
+      const _this = this;
 
       this.connection.onmessage = function(event) {
+        //console.log('EVENTTTT ', JSON.parse(event.data));
+        let message = JSON.parse(event.data);
+        console.log('Name=====>>> ', message.name);
+        switch (message.name) {
+          case 'eventList':
+            console.log('eventList: ', JSON.parse(message.data));
+            _this.eventList = JSON.parse(message.data);
+            _this.dialog = true;
+            console.log('Names ====>> ', this.eventList.map(event => event.eventName));
+            break;
+        
+          default:
+            console.log('Out of bound event', event);
+            break;
+        }
         console.log(event);
       }
       this.connection.onopen = function(event) {
         console.log(event)
-        console.log("Successfully connected to the echo websocket server...")
+        console.log("Successfully connected to the websocket server...")
+       _this.connection.send('{"action": "listEvents"}');
       }
       this.connection.onclose = function(event) {
         console.log('closed connection: ', event);
@@ -199,6 +228,7 @@
       this.connection.onerror = function(event) {
         console.log('error: ', event);
       }
+
 
     }
   }
