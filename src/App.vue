@@ -104,6 +104,7 @@
           v-for="[icon, text] in links"
           :key="icon"
           link
+          v-on:click="disconnect()"
         >
           <v-list-item-icon>
             <v-icon>{{ icon }}</v-icon>
@@ -214,6 +215,13 @@
       },
       testIng(msg){
         console.log('AAAAA, ', msg);
+      },
+      disconnect() {
+        const structure = {
+          "action": "$disconnect"
+          }
+          console.log('STRUCTURE: ', JSON.stringify(structure));
+          this.sendMessage(JSON.stringify(structure));
       },
       sendUpdate() {
         this.eventTitle = this.eventList.find( x => x.roomId == this.selectedEvent).eventName;
