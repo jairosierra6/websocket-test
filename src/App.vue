@@ -1,6 +1,18 @@
 <template>
   <v-app id="inspire">
+    <v-system-bar height="50" app>
+      <h1><b>Event:</b> {{eventTitle}}</h1>
+      <v-spacer></v-spacer>
 
+      <v-tooltip v-for="user in usersOnThisEvent" :key="user.connectionId" bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-avatar :color="user.id" size="40" v-bind="attrs" v-on="on" style="margin: 2px">
+          <span style="color: black; font-weight: bold;">{{user.firstName.toUpperCase().charAt(0)}}{{user.lastName.toUpperCase().charAt(0)}}</span>
+        </v-avatar>
+      </template>
+      <span>{{user.firstName}} {{user.lastName}}</span>
+    </v-tooltip>     
+    </v-system-bar>
     <div>
       <v-dialog
         v-model="dialog"
@@ -17,7 +29,6 @@
                 <v-col
                   cols="12"
                   sm="6"
-                  md="4"
                 >
                   <v-text-field
                     label="First name*"
@@ -29,18 +40,6 @@
                 <v-col
                   cols="12"
                   sm="6"
-                  md="4"
-                >
-                  <v-text-field
-                    label="Middle name"
-                    v-model="mName"
-                    hint="example of helper text only on focus"
-                  ></v-text-field>
-                </v-col>
-                <v-col
-                  cols="12"
-                  sm="6"
-                  md="4"
                 >
                   <v-text-field
                     label="Last name*"
@@ -91,14 +90,8 @@
         color="grey darken-4"
         class="pa-4"
       >
-        <v-avatar
-          class="mb-4"
-          color="grey darken-1"
-          size="64"
-        >
-        
-          <img v-if="userLoaded" src='https://i.pravatar.cc/300'/>
-
+        <v-avatar class="mb-4" :color="this.color" size="64">
+          <span style="color: black; font-weight: bold; font-size: 35px;">{{fName.toUpperCase().charAt(0)}}{{lName.toUpperCase().charAt(0)}}</span>        
         </v-avatar>
 
         <div >{{username}}</div>
@@ -192,12 +185,14 @@
       eventList: [],
       selectedEvent: {},
       fName: '',
-      mName: '',
       lName: '',
       newEventData: '',
       nameRules: [
           (v) => !!v || 'Field is required'
         ],
+      usersOnThisEvent: [],
+      eventTitle: '',
+      color: ''
     }),
     watch: {
       eventList: function() {
@@ -209,14 +204,26 @@
         console.log('CONNECTION: ', this.connection);
         this.connection.send(message);
       },
+      getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+      },
       testIng(msg){
         console.log('AAAAA, ', msg);
       },
       sendUpdate() {
+        this.eventTitle = this.eventList.find( x => x.roomId == this.selectedEvent).eventName;
+        console.log('eventTitle: ', this.eventTitle);
+        this.username = `${this.fName} ${this.lName}`;
+        this.color = this.getRandomColor();
         const structure = {
           "action": "setEvent",
           "roomId": `${this.selectedEvent}`,
-          "users": `{"name": "${this.fName} ${this.mName} ${this.lName}", "id": "${this.selectedEvent}"}` ,
+          "users": `{"name": "${this.fName}+${this.lName}", "id": "${this.color}"}` ,
           "eventJSON":null
           }
           console.log('STRUCTURE: ', JSON.stringify(structure));
@@ -233,13 +240,59 @@
       this.connection.onmessage = function(event) {
         //console.log('EVENTTTT ', JSON.parse(event.data));
         let message = JSON.parse(event.data);
+        console.log('MESGGG ', message);
         console.log('Name=====>>> ', message.name);
         switch (message.name) {
           case 'eventList':
             console.log('eventList: ', JSON.parse(message.data));
             _this.eventList = JSON.parse(message.data);
             _this.dialog = true;
-            console.log('Names ====>> ', this.eventList.map(event => event.eventName));
+            console.log('Event Names ====>> ', this.eventList.map(event => event.eventName));
+            break;
+            case 'updatedEvent':
+            console.log('NEW EVENT DATA: ', JSON.parse(message.data));
+            // alert the new event data
+            break;
+            case 'connectedUser':
+              // eslint-disable-next-line no-case-declarations
+              // eslint-disable-next-line no-case-declarations
+              const temp = {
+                connectionId: message.data.connectionId,
+                id: message.data.id,
+                firstName: message.data.name.split('+')[0],
+                lastName: message.data.name.split('+')[1]
+              }
+              _this.usersOnThisEvent.push(temp);
+              console.log('NEW USER CONNECTED: ', message.data);
+            break;
+            case 'connectedUsers':
+              // eslint-disable-next-line no-case-declarations
+              //_this.usersOnThisEvent.push(temp3);
+              console.log('USER LIST CONNECTED: ', message.data);
+              // eslint-disable-next-line no-case-declarations
+              let response = message.data.connectedUsers;
+              response.forEach(element => {
+                element = JSON.parse(element);
+                const tempo = {
+                  connectionId: element.connectionId,
+                  id: element.id,
+                  firstName: element.name.split('+')[0],
+                  lastName: element.name.split('+')[1]
+                }
+              _this.usersOnThisEvent.push(tempo);
+              });
+            break;
+            case 'disconnectedUser':
+              // eslint-disable-next-line no-case-declarations
+              // eslint-disable-next-line no-case-declarations
+              const tempo = {
+                connectionId: message.data.connectionId,
+                id: message.data.id,
+                firstName: message.data.name.split('+')[0],
+                lastName: message.data.name.split('+')[1]
+              }
+              _this.usersOnThisEvent.push(tempo);
+              console.log('NEW USER CONNECTED: ', message.data);
             break;
         
           default:
