@@ -136,6 +136,7 @@
         </v-list-item>
         <v-list-item>
           <v-switch
+            id="jsonData.isDark"
             v-model="jsonData.isDark"
             :label="`Dark Theme`"
             @change="changeTheme(jsonData.isDark)"
@@ -154,42 +155,47 @@
 
           <!-- Controls -->
             <v-checkbox
+                id="jsonData.checkLanguage"
                 v-model="jsonData.checkLanguage"
                 label="Enable event languages"
                 color="primary"
                 hide-details
                 @change="sendChangedData(jsonData.checkLanguage, 'checkLanguage')"
-                v-on:focus="testIng(jsonData.checkLanguage + 'focusss')"
+                v-on:focus="sendCurrentLocation()"
             ></v-checkbox>
             <v-checkbox
+                id="jsonData.checkLogin"
                 v-model="jsonData.checkLogin"
                 label="Enable auto login"
                 color="primary"
                 hide-details
                 @change="sendChangedData(jsonData.checkLogin, 'checkLogin')"
-                v-on:focus="testIng(jsonData.checkLogin + 'focusss')"
+                v-on:focus="sendCurrentLocation()"
             ></v-checkbox>
             <v-checkbox
+                id="jsonData.checkVideo"
                 v-model="jsonData.checkVideo"
                 label="Enable video"
                 color="primary"
                 hide-details
                 @change="sendChangedData(jsonData.checkVideo, 'checkVideo')"
-                v-on:focus="testIng(jsonData.checkVideo + 'focusss')"
+                v-on:focus="sendCurrentLocation()"
             ></v-checkbox>
             <v-text-field
+                id="jsonData.eventName"
                 v-model="jsonData.eventName"
                 label="Name of the event"
                 placeholder="Name of the event"
                 v-on:blur="sendChangedData(jsonData.eventName, 'eventName')"
-                v-on:focus="testIng(jsonData.eventName + 'focusss')"
+                v-on:focus="sendCurrentLocation()"
             ></v-text-field>
             <v-text-field
+                id="jsonData.url"
                 v-model="jsonData.url"
                 label="Vep url of the event"
                 placeholder="Url of the event"
                 v-on:blur="sendChangedData(jsonData.url, 'url')"
-                v-on:focus="testIng(jsonData.url + 'focusss')"
+                v-on:focus="sendCurrentLocation()"
             ></v-text-field>
 
           <!-- Controls -->
@@ -251,11 +257,12 @@
         this.$vuetify.theme.dark = value;
         console.log('VALUE ', value, '\n\nTYPE: ', typeof(value));
       },
-      sendCurrentLocation(name) {
+      sendCurrentLocation() {
+        console.log('\nTHISSS ',event.target.id);
         const structure = {
             "action": "locatedOn",
             "roomId": `${this.selectedEvent}`,
-            "route": `${name}`,
+            "route": `${event.target.id}`,
           }
           console.log('STRUCTURE ', structure);
           this.sendMessage(JSON.stringify(structure));
@@ -392,13 +399,13 @@
                   _this.jsonData.url = message.newData;
                   break;
                 case 'checkLanguage':
-                  _this.jsonData.checkLanguage = message.newData;
+                  _this.jsonData.checkLanguage = (message.newData === 'true') ? true : false;
                   break;
                 case 'checkLogin':
-                  _this.jsonData.checkLogin = message.newData;
+                  _this.jsonData.checkLogin = (message.newData === 'true') ? true : false;
                   break;
                 case 'checkVideo':
-                  _this.jsonData.checkVideo = message.newData;
+                  _this.jsonData.checkVideo = (message.newData === 'true') ? true : false;
                   break;
                 case 'isDark':
                   // eslint-disable-next-line no-case-declarations
@@ -414,8 +421,22 @@
             case 'locatedOn':
               // eslint-disable-next-line no-case-declarations
               switch (message.route) {
-                case 'eventName':
-                               
+                case 'jsonData.eventName':
+                  console.log('\nROUTE:>>>>>> ', message.route);
+                  break;
+                case 'jsonData.url':
+                  console.log('\nROUTE:>>>>>> ', message.route);
+                  break;
+                case 'jsonData.checkLanguage':
+                  console.log('\nROUTE:>>>>>> ', message.route);
+                  break;
+                case 'jsonData.checkLogin':
+                  console.log('\nROUTE:>>>>>> ', message.route);
+                  break;
+                case 'jsonData.checkVideo':
+                  console.log('\nROUTE:>>>>>> ', message.route);
+                  break;
+                case 'jsonData.isDark':
                   break;
               
                 default:
