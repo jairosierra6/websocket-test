@@ -13,6 +13,26 @@
       <span>{{user.firstName}} {{user.lastName}}</span>
     </v-tooltip>     
     </v-system-bar>
+    <v-dialog
+      v-model="standby"
+      hide-overlay
+      persistent
+      width="300"
+    >
+      <v-card
+        color="primary"
+        dark
+      >
+        <v-card-text>
+          Please stand by
+          <v-progress-linear
+            indeterminate
+            color="white"
+            class="mb-0"
+          ></v-progress-linear>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <div>
       <v-dialog
         v-model="dialog"
@@ -125,40 +145,40 @@
         <v-row>
           <v-col cols="12">
 
-          <!-- Viejo ramiro desde aca puedes agregar los controles -->
+          <!-- Controls -->
             <v-checkbox
-                v-model="checkLanguage"
+                v-model="jsonData.checkLanguage"
                 label="Enable event languages"
                 color="primary"
-                value="language"
                 hide-details
             ></v-checkbox>
             <v-checkbox
-                v-model="checkLogin"
+                v-model="jsonData.checkLogin"
                 label="Enable auto login"
                 color="primary"
-                value="auto login"
                 hide-details
             ></v-checkbox>
             <v-checkbox
-                v-model="checkVideo"
+                v-model="jsonData.checkVideo"
                 label="Enable video"
                 color="primary"
-                value="video"
                 hide-details
             ></v-checkbox>
             <v-text-field
-                v-model="configuration1"
+                v-model="jsonData.eventName"
                 label="Name of the event"
                 placeholder="Name of the event"
+                :value="jsonData.eventName"
+                v-on:blur="sendChangedData(jsonData.eventName, 'eventName')"
+                v-on:focus="testIng(jsonData.eventName + 'focusss')"
             ></v-text-field>
             <v-text-field
-                v-model="url"
+                v-model="jsonData.url"
                 label="Vep url of the event"
                 placeholder="Url of the event"
             ></v-text-field>
 
-          <!-- hasta aca agregar los controles -->
+          <!-- Controls -->
           </v-col>
         </v-row>
       </v-container>
@@ -169,6 +189,7 @@
 <script>
   export default {
     data: () => ({
+      standby: true,
       connection: null,
       socketUrl: 'wss://tnpbcownl8.execute-api.us-east-2.amazonaws.com/dev',
       username: 'User Name',
@@ -196,13 +217,40 @@
       checkVideo: '',
       configuration1: '',
       url: '',
+      jsonData: {},
     }),
     watch: {
       eventList: function() {
         console.log('Event changed ', this.eventList);
+      },
+      jsonData: function(value) {
+        console.log('jsonData changed ', this.jsonData, '\nValue: ', value);
       }
     },
     methods: {
+      sendCurrentLocation(name) {
+        const structure = {
+            "action": "locatedOn",
+            "roomId": `${this.selectedEvent}`,
+            "route": `${name}`,
+          }
+          console.log('STRUCTURE ', structure);
+          this.sendMessage(JSON.stringify(structure));
+      },
+      sendChangedData(dataToSend, name) {
+        if (dataToSend !== null && dataToSend !== undefined) {
+          let test = Object.keys(this.jsonData);
+          console.log('test ', test, '\nTST2 ', Object.keys(dataToSend));
+          const structure = {
+            "action": "changedData",
+            "roomId": `${this.selectedEvent}`,
+            "route": `${name}`,
+            "newData": `${dataToSend}`,
+          }
+          console.log('STRUCTURE ', structure);
+          this.sendMessage(JSON.stringify(structure));
+        }
+      },
       sendMessage(message) {
         console.log('CONNECTION: ', this.connection);
         this.connection.send(message);
@@ -235,10 +283,10 @@
           "roomId": `${this.selectedEvent}`,
           "users": `{"name": "${this.fName}+${this.lName}", "id": "${this.color}"}` ,
           "eventJSON":null
-          }
-          console.log('STRUCTURE: ', JSON.stringify(structure));
-          this.sendMessage(JSON.stringify(structure));
-          this.dialog = false;
+        }
+        console.log('STRUCTURE: ', JSON.stringify(structure));
+        this.sendMessage(JSON.stringify(structure));
+        this.dialog = false;
       },
       inactivity() {
         let r = confirm("Connection closed due to activity, do you want to reload?");
@@ -262,6 +310,7 @@
           case 'eventList':
             console.log('eventList: ', JSON.parse(message.data));
             _this.eventList = JSON.parse(message.data);
+            _this.standby = false;
             _this.dialog = true;
             console.log('Event Names ====>> ', this.eventList.map(event => event.eventName));
             break;
@@ -306,9 +355,32 @@
               _this.usersOnThisEvent = _this.usersOnThisEvent.filter(element => element.connectionId !== disconnectedUser.connectionId)
               console.log('AFTER DISCON ', _this.usersOnThisEvent);
             break;
+            case 'changedData':
+              // eslint-disable-next-line no-case-declarations
+              switch (message.route) {
+                case 'eventName':
+                  _this.jsonData.eventName = message.newData;
+                  break;
+              
+                default:
+                  break;
+              }
+              _this.$forceUpdate();            
+            break;
+            case 'locatedOn':
+              // eslint-disable-next-line no-case-declarations
+              switch (message.route) {
+                case 'eventName':
+                               
+                  break;
+              
+                default:
+                  break;
+              }
+            break;
         
           default:
-            console.log('Out of bound event', event);
+            console.log('Out of bound event', message);
             break;
         }
         console.log(event);
