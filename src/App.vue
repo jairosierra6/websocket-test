@@ -154,50 +154,153 @@
           <v-col cols="12">
 
           <!-- Controls -->
-            <v-checkbox
-                id="jsonData.checkLanguage"
-                v-model="jsonData.checkLanguage"
-                label="Enable event languages"
-                color="primary"
-                hide-details
-                @change="sendChangedData(jsonData.checkLanguage, 'checkLanguage')"
-                v-on:focus="sendCurrentLocation()"
-            ></v-checkbox>
-            <v-checkbox
-                id="jsonData.checkLogin"
-                v-model="jsonData.checkLogin"
-                label="Enable auto login"
-                color="primary"
-                hide-details
-                @change="sendChangedData(jsonData.checkLogin, 'checkLogin')"
-                v-on:focus="sendCurrentLocation()"
-            ></v-checkbox>
-            <v-checkbox
-                id="jsonData.checkVideo"
-                v-model="jsonData.checkVideo"
-                label="Enable video"
-                color="primary"
-                hide-details
-                @change="sendChangedData(jsonData.checkVideo, 'checkVideo')"
-                v-on:focus="sendCurrentLocation()"
-            ></v-checkbox>
-            <v-text-field
-                id="jsonData.eventName"
-                v-model="jsonData.eventName"
-                label="Name of the event"
-                placeholder="Name of the event"
-                v-on:blur="sendChangedData(jsonData.eventName, 'eventName')"
-                v-on:focus="sendCurrentLocation()"
-            ></v-text-field>
-            <v-text-field
-                id="jsonData.url"
-                v-model="jsonData.url"
-                label="Vep url of the event"
-                placeholder="Url of the event"
-                v-on:blur="sendChangedData(jsonData.url, 'url')"
-                v-on:focus="sendCurrentLocation()"
-            ></v-text-field>
 
+          <!--  -->
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="text-h5 mb-1">
+                  <v-checkbox
+                    id="jsonData.checkLanguage"
+                    v-model="jsonData.checkLanguage"
+                    label="Enable event languages"
+                    color="primary"
+                    hide-details
+                    @change="sendChangedData(jsonData.checkLanguage, 'checkLanguage')"
+                    v-on:focus="sendCurrentLocation()"
+                ></v-checkbox>
+                </v-list-item-title>
+                <v-list-item-subtitle>Description of this option</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+        
+            <v-card-actions>
+              {{usersEditing.checkLanguage}}
+            </v-card-actions>
+          </v-card>
+          <!--  -->
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="text-h5 mb-1">
+                  <v-checkbox
+                    id="jsonData.checkLogin"
+                    v-model="jsonData.checkLogin"
+                    label="Enable auto login"
+                    color="primary"
+                    hide-details
+                    @change="sendChangedData(jsonData.checkLogin, 'checkLogin')"
+                    v-on:focus="sendCurrentLocation()"
+                ></v-checkbox>
+                </v-list-item-title>
+                <v-list-item-subtitle>Description of this option</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+        
+            <v-card-actions>
+              {{usersEditing.checkLogin}}
+            </v-card-actions>
+          </v-card>
+          <!--  -->
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="text-h5 mb-1">
+                  <v-checkbox
+                    id="jsonData.checkVideo"
+                      v-model="jsonData.checkVideo"
+                      label="Enable video"
+                      color="primary"
+                      hide-details
+                      @change="sendChangedData(jsonData.checkVideo, 'checkVideo')"
+                      @mouseover="sendCurrentLocation()"
+                  ></v-checkbox>
+                </v-list-item-title>
+                <v-list-item-subtitle>Description of this option</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+        
+            <v-card-actions>
+              {{usersEditing.checkVideo}}
+            </v-card-actions>
+          </v-card>
+          <!--  -->
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="text-h5 mb-1">
+                  <v-text-field
+                      id="jsonData.eventName"
+                      v-model="jsonData.eventName"
+                      label="Name of the event"
+                      placeholder="Name of the event"
+                      v-on:blur="sendChangedData(jsonData.eventName, 'eventName')"
+                      v-on:focus="sendCurrentLocation()"
+                  ></v-text-field>
+                </v-list-item-title>
+                <v-list-item-subtitle>Description of this option</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+        
+            <v-card-actions>
+              <!-- convert to a component -->
+                <v-tooltip v-for="user in usersEditing.eventName" :key="user.connectionId" bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-avatar class="pulse-animation" :color="user.id" size="25" v-bind="attrs" v-on="on" style="margin: 2px">
+                      <span style="color: black; font-weight: bold; font-size: 10px;">{{user.firstName.toUpperCase().charAt(0)}}{{user.lastName.toUpperCase().charAt(0)}}</span>
+                    </v-avatar>
+                  </template>
+                  <span>{{user.firstName}} {{user.lastName}}</span>
+                </v-tooltip>  
+              <!-- convert to a component -->      
+            </v-card-actions>
+          </v-card>
+          <!--  -->
+          <v-card
+            class="mx-auto"
+            outlined
+          >
+            <v-list-item three-line>
+              <v-list-item-content>
+                <v-list-item-title class="text-h5 mb-1">
+                  <v-text-field
+                    id="jsonData.url"
+                    v-model="jsonData.url"
+                    label="Vep url of the event"
+                    placeholder="Url of the event"
+                    v-on:blur="sendChangedData(jsonData.url, 'url')"
+                    v-on:focus="sendCurrentLocation()"
+                ></v-text-field>
+                </v-list-item-title>
+                <v-list-item-subtitle>Description of this option</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+        
+            <v-card-actions>
+              <!-- convert to a component -->
+                <v-tooltip v-for="user in usersEditing.url" :key="user.connectionId" bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-avatar class="pulse-animation" :color="user.id" size="25" v-bind="attrs" v-on="on" style="margin: 2px">
+                      <span style="color: black; font-weight: bold; font-size: 10px;">{{user.firstName.toUpperCase().charAt(0)}}{{user.lastName.toUpperCase().charAt(0)}}</span>
+                    </v-avatar>
+                  </template>
+                  <span>{{user.firstName}} {{user.lastName}}</span>
+                </v-tooltip>  
+              <!-- convert to a component -->     
+            </v-card-actions>
+          </v-card>
           <!-- Controls -->
           </v-col>
         </v-row>
@@ -205,7 +308,27 @@
     </v-main>
   </v-app>
 </template>
-
+<style scoped>
+.pulse-animation {
+  border:1px solid white;    
+    border-radius:50%;
+    -moz-border-radius:50%;
+    -webkit-border-radius:50%;
+  animation: pulse 0.4s ease infinite alternate;
+}
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 2px 2px rgba(0,0,0,.2);
+    border-radius: 50%;
+  }
+  100% {
+    transform: scale(1.15);
+    box-shadow: 0 2px 2px rgba(0,0,0,.2);
+    border-radius: 45%;
+  }
+}
+</style>
 <script>
   export default {
     data: () => ({
@@ -238,6 +361,7 @@
       configuration1: '',
       url: '',
       jsonData: {},
+      usersEditing: {},
     }),
     watch: {
       eventList: function() {
@@ -394,18 +518,34 @@
               switch (message.route) {
                 case 'eventName':
                   _this.jsonData.eventName = message.newData;
+                  try {
+                    _this.usersEditing = _this.usersEditing.eventName.filter(x => x.connectionId !== message.connectionId)
+                  } catch (error) {console.log(error);}
                   break;
                 case 'url':
                   _this.jsonData.url = message.newData;
+                  try {
+                    _this.usersEditing = _this.usersEditing.url.filter(x => x.connectionId !== message.connectionId)
+                  } catch (error) {console.log(error);}
                   break;
                 case 'checkLanguage':
                   _this.jsonData.checkLanguage = (message.newData === 'true') ? true : false;
+                  try {
+                    _this.usersEditing = _this.usersEditing.checkLanguage.filter(x => x.connectionId !== message.connectionId)
+                  } catch (error) {console.log(error);}
                   break;
                 case 'checkLogin':
                   _this.jsonData.checkLogin = (message.newData === 'true') ? true : false;
+                  try {
+                    _this.usersEditing = _this.usersEditing.checkLogin.filter(x => x.connectionId !== message.connectionId)
+                  } catch (error) {console.log(error);}
                   break;
                 case 'checkVideo':
                   _this.jsonData.checkVideo = (message.newData === 'true') ? true : false;
+                  try {
+                    _this.usersEditing = _this.usersEditing.checkVideo.filter(x => x.connectionId !== message.connectionId)
+                  } catch (error) {console.log(error);}
+                  
                   break;
                 case 'isDark':
                   // eslint-disable-next-line no-case-declarations
@@ -420,21 +560,41 @@
             break;
             case 'locatedOn':
               // eslint-disable-next-line no-case-declarations
+              let userToAdd = {};
+              if (message.route){
+                userToAdd = _this.usersOnThisEvent.find( x => x.connectionId == message.connectionId );
+                console.log('\nUSRSS:>>>>>> ', _this.usersEditing);
+              }
               switch (message.route) {
                 case 'jsonData.eventName':
-                  console.log('\nROUTE:>>>>>> ', message.route);
+                  if (_this.usersEditing.eventName === undefined) {
+                    _this.usersEditing.eventName = []
+                  }
+                  _this.usersEditing.eventName.push(userToAdd);                  
                   break;
                 case 'jsonData.url':
-                  console.log('\nROUTE:>>>>>> ', message.route);
+                  if (_this.usersEditing.url === undefined) {
+                    _this.usersEditing.url = []
+                  }
+                  _this.usersEditing.url.push(userToAdd); 
                   break;
                 case 'jsonData.checkLanguage':
-                  console.log('\nROUTE:>>>>>> ', message.route);
+                  if (_this.usersEditing.checkLanguage === undefined) {
+                    _this.usersEditing.checkLanguage = []
+                  }
+                  _this.usersEditing.checkLanguage.push(userToAdd); 
                   break;
                 case 'jsonData.checkLogin':
-                  console.log('\nROUTE:>>>>>> ', message.route);
+                  if (_this.usersEditing.checkLogin === undefined) {
+                    _this.usersEditing.checkLogin = []
+                  }
+                  _this.usersEditing.checkLogin.push(userToAdd); 
                   break;
                 case 'jsonData.checkVideo':
-                  console.log('\nROUTE:>>>>>> ', message.route);
+                  if (_this.usersEditing.checkVideo === undefined) {
+                    _this.usersEditing.checkVideo = []
+                  }
+                  _this.usersEditing.checkVideo.push(userToAdd); 
                   break;
                 case 'jsonData.isDark':
                   break;
@@ -442,6 +602,7 @@
                 default:
                   break;
               }
+              _this.$forceUpdate();   
             break;
         
           default:
