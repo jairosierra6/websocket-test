@@ -107,7 +107,7 @@
       app
     >
       <v-sheet
-        color="grey darken-4"
+        :color="jsonData.isDark ? 'grey darken-4': 'grey lighten-4'"
         class="pa-4"
       >
         <v-avatar class="mb-4" :color="this.color" size="64">
@@ -133,6 +133,13 @@
           <v-list-item-content>
             <v-list-item-title>{{ text }}</v-list-item-title>
           </v-list-item-content>
+        </v-list-item>
+        <v-list-item>
+          <v-switch
+            v-model="jsonData.isDark"
+            :label="`Dark Theme`"
+            @change="changeTheme(jsonData.isDark)"
+          ></v-switch>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
@@ -235,6 +242,15 @@
       }
     },
     methods: {
+      changeTheme(value){
+        this.toggle(value);
+        this.sendChangedData(value, 'isDark')
+        this.$forceUpdate();
+      },
+      toggle(value) {
+        this.$vuetify.theme.dark = value;
+        console.log('VALUE ', value, '\n\nTYPE: ', typeof(value));
+      },
       sendCurrentLocation(name) {
         const structure = {
             "action": "locatedOn",
@@ -305,7 +321,7 @@
     created: function() {
       console.log("Starting connection to WebSocket Server")
       this.connection = new WebSocket(this.socketUrl);
-      
+      this.jsonData.isDark =true;
       const _this = this;
 
       this.connection.onmessage = function(event) {
@@ -319,7 +335,11 @@
             _this.eventList = JSON.parse(message.data);
             _this.standby = false;
             _this.dialog = true;
-            console.log('Event Names ====>> ', this.eventList.map(event => event.eventName));
+            try {
+              console.log('Event Names ====>> ', this.eventList.map(event => event.eventName));              
+            } catch (error) {
+              console.log('ERROR> ', error);
+            }
             break;
             case 'updatedEvent':
             console.log('NEW EVENT DATA: ', JSON.parse(message.data));
@@ -379,6 +399,12 @@
                   break;
                 case 'checkVideo':
                   _this.jsonData.checkVideo = message.newData;
+                  break;
+                case 'isDark':
+                  // eslint-disable-next-line no-case-declarations
+                  let result = (message.newData === 'true') ? true : false;
+                  _this.jsonData.isDark = result;
+                  _this.toggle(result);
                   break;
                 default:
                   break;
