@@ -239,7 +239,13 @@
           console.log('STRUCTURE: ', JSON.stringify(structure));
           this.sendMessage(JSON.stringify(structure));
           this.dialog = false;
-      }
+      },
+      inactivity() {
+        let r = confirm("Connection closed due to activity, do you want to reload?");
+        if (r == true) {
+          location.reload();
+        } 
+      },
     },
     created: function() {
       console.log("Starting connection to WebSocket Server")
@@ -314,6 +320,7 @@
       }
       this.connection.onclose = function(event) {
         console.log('closed connection: ', event);
+        _this.inactivity();
       }
       this.connection.onerror = function(event) {
         console.log('error: ', event);
