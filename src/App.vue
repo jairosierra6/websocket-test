@@ -123,11 +123,7 @@
         fluid
       >
         <v-row>
-          <v-col
-            v-for="card in cards"
-            :key="card"
-            cols="12"
-          >
+          <v-col cols="12">
 
           <!-- Viejo ramiro desde aca puedes agregar los controles -->
             <v-checkbox
@@ -152,7 +148,7 @@
                 hide-details
             ></v-checkbox>
             <v-text-field
-                v-model="configuration"
+                v-model="configuration1"
                 label="Name of the event"
                 placeholder="Name of the event"
             ></v-text-field>
@@ -163,35 +159,6 @@
             ></v-text-field>
 
           <!-- hasta aca agregar los controles -->
-            <v-card>
-              <v-subheader>{{ card }}</v-subheader>
-
-              <v-list two-line>
-                <template v-for="n in 3">
-                  <v-list-item
-
-                    :key="n"
-                  >
-                    <v-list-item-avatar color="grey darken-1">
-                    </v-list-item-avatar>
-
-                    <v-list-item-content>
-                      <v-list-item-title>Message {{ n }}</v-list-item-title>
-
-                      <v-list-item-subtitle>
-                        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Nihil repellendus distinctio similique
-                      </v-list-item-subtitle>
-                    </v-list-item-content>
-                  </v-list-item>
-
-                  <v-divider
-                    v-if="n !== 3"
-                    :key="`divider-${n}`"
-                    inset
-                  ></v-divider>
-                </template>
-              </v-list>
-            </v-card>
           </v-col>
         </v-row>
       </v-container>
@@ -223,7 +190,12 @@
         ],
       usersOnThisEvent: [],
       eventTitle: '',
-      color: ''
+      color: '',
+      checkLanguage: '',
+      checkLogin: '',
+      checkVideo: '',
+      configuration1: '',
+      url: '',
     }),
     watch: {
       eventList: function() {
@@ -250,8 +222,8 @@
         const structure = {
           "action": "$disconnect"
           }
-          console.log('STRUCTURE: ', JSON.stringify(structure));
           this.sendMessage(JSON.stringify(structure));
+          location.reload();
       },
       sendUpdate() {
         this.eventTitle = this.eventList.find( x => x.roomId == this.selectedEvent).eventName;
@@ -322,15 +294,11 @@
             break;
             case 'disconnectedUser':
               // eslint-disable-next-line no-case-declarations
-              // eslint-disable-next-line no-case-declarations
-              const tempo = {
-                connectionId: message.data.connectionId,
-                id: message.data.id,
-                firstName: message.data.name.split('+')[0],
-                lastName: message.data.name.split('+')[1]
-              }
-              _this.usersOnThisEvent.push(tempo);
-              console.log('NEW USER CONNECTED: ', message.data);
+              let disconnectedUser = message.data;
+              console.log('DISCONNECTED USER: ', disconnectedUser);
+              console.log('BEFORE DISCON ', _this.usersOnThisEvent);
+              _this.usersOnThisEvent = _this.usersOnThisEvent.filter(element => element.connectionId !== disconnectedUser.connectionId)
+              console.log('AFTER DISCON ', _this.usersOnThisEvent);
             break;
         
           default:
