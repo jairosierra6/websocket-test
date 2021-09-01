@@ -151,24 +151,29 @@
                 label="Enable event languages"
                 color="primary"
                 hide-details
+                @change="sendChangedData(jsonData.checkLanguage, 'checkLanguage')"
+                v-on:focus="testIng(jsonData.checkLanguage + 'focusss')"
             ></v-checkbox>
             <v-checkbox
                 v-model="jsonData.checkLogin"
                 label="Enable auto login"
                 color="primary"
                 hide-details
+                @change="sendChangedData(jsonData.checkLogin, 'checkLogin')"
+                v-on:focus="testIng(jsonData.checkLogin + 'focusss')"
             ></v-checkbox>
             <v-checkbox
                 v-model="jsonData.checkVideo"
                 label="Enable video"
                 color="primary"
                 hide-details
+                @change="sendChangedData(jsonData.checkVideo, 'checkVideo')"
+                v-on:focus="testIng(jsonData.checkVideo + 'focusss')"
             ></v-checkbox>
             <v-text-field
                 v-model="jsonData.eventName"
                 label="Name of the event"
                 placeholder="Name of the event"
-                :value="jsonData.eventName"
                 v-on:blur="sendChangedData(jsonData.eventName, 'eventName')"
                 v-on:focus="testIng(jsonData.eventName + 'focusss')"
             ></v-text-field>
@@ -176,6 +181,8 @@
                 v-model="jsonData.url"
                 label="Vep url of the event"
                 placeholder="Url of the event"
+                v-on:blur="sendChangedData(jsonData.url, 'url')"
+                v-on:focus="testIng(jsonData.url + 'focusss')"
             ></v-text-field>
 
           <!-- Controls -->
@@ -361,7 +368,18 @@
                 case 'eventName':
                   _this.jsonData.eventName = message.newData;
                   break;
-              
+                case 'url':
+                  _this.jsonData.url = message.newData;
+                  break;
+                case 'checkLanguage':
+                  _this.jsonData.checkLanguage = message.newData;
+                  break;
+                case 'checkLogin':
+                  _this.jsonData.checkLogin = message.newData;
+                  break;
+                case 'checkVideo':
+                  _this.jsonData.checkVideo = message.newData;
+                  break;
                 default:
                   break;
               }
