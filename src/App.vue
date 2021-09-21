@@ -615,7 +615,13 @@
       this.connection.onopen = function(event) {
         console.log(event)
         console.log("Successfully connected to the websocket server...")
-       _this.connection.send('{"action": "listEvents"}');
+        const structure = {
+            "action":"sandboxeventeditor",
+            "version": "v1",
+            "channel": "eventid_room1",
+            "message": {"action": "onInput", "eventId": "52", "route": "path.test3", "data": "data changed from frontend"}
+        }
+       _this.connection.send(JSON.stringify(structure));
       }
       this.connection.onclose = function(event) {
         console.log('closed connection: ', event);
