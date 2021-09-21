@@ -334,7 +334,8 @@
     data: () => ({
       standby: true,
       connection: null,
-      socketUrl: 'wss://tnpbcownl8.execute-api.us-east-2.amazonaws.com/dev',
+      socketUrl: 'wss://wsgateway.6connex.us/us2-dev-a',
+      token: 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJCRHpoOGkzWGx0enlSOTVmRW1tSFFnPT0iLCJ1c2VySWQiOiJTR0NSWm1HeDcyQnR4YTIwZVExMFN3PT0iLCJyb2xlIjoic0VGcDBCUTFEWGk3UmIvWWhDdVZnZz09IiwiY2xpZW50IjoiaDFEeTJzUDNTYjJBMmp5TTZIT25vQT09IiwiZXZlbnQiOiJKN01jY0ZIMnkyV0gwaXdjVmI0M2RBPT0iLCJqdGkiOiJmMTlhNjg0MC1lZDRmLTRmYmQtODk1Ny01NWVjMjc0ZThmMjAiLCJpYXQiOjE2MzIyMzM1MzcsImV4cCI6MTYzMjk1MzUzN30.aO-P7RYhBA9H8aC8Gzhz_4OX-zqfDvq11nhPOI_IWuHxfuzNN4uBdzVboJfnPvatfyrm9j7Wp0Dna0Rptr6oow',
       username: 'User Name',
       userLoaded: false,
       dialog: false,
@@ -451,7 +452,7 @@
     },
     created: function() {
       console.log("Starting connection to WebSocket Server")
-      this.connection = new WebSocket(this.socketUrl);
+      this.connection = new WebSocket(this.socketUrl+'?token='+this.token);
       this.jsonData.isDark =true;
       const _this = this;
 
@@ -460,8 +461,8 @@
         let message = JSON.parse(event.data);
         console.log('MESGGG ', message);
         console.log('Name=====>>> ', message.name);
-        switch (message.name) {
-          case 'eventList':
+        switch (message.method) {
+          case 'onBlur':
             console.log('eventList: ', JSON.parse(message.data));
             _this.eventList = JSON.parse(message.data);
             _this.standby = false;
@@ -472,11 +473,11 @@
               console.log('ERROR> ', error);
             }
             break;
-            case 'updatedEvent':
+            case 'onFocus':
             console.log('NEW EVENT DATA: ', JSON.parse(message.data));
             // alert the new event data
             break;
-            case 'connectedUser':
+            case 'onInput':
               // eslint-disable-next-line no-case-declarations
               // eslint-disable-next-line no-case-declarations
               const temp = {
@@ -488,7 +489,7 @@
               _this.usersOnThisEvent.push(temp);
               console.log('NEW USER CONNECTED: ', message.data);
             break;
-            case 'connectedUsers':
+            case 'activeUsers':
               // eslint-disable-next-line no-case-declarations
               //_this.usersOnThisEvent.push(temp3);
               console.log('USER LIST CONNECTED: ', message.data);
@@ -556,7 +557,7 @@
                 default:
                   break;
               }
-              _this.$forceUpdate();            
+              _this.$forceUpdate();
             break;
             case 'locatedOn':
               // eslint-disable-next-line no-case-declarations
